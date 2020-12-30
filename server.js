@@ -41,8 +41,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: process.env.frontendURL, // <-- location of the react app were connecting to
-    credentials: true,
+    origin: "*", // <-- location of the react app were connecting to
   })
 );
 
@@ -94,33 +93,11 @@ app.get("/api/teams/:eventName", (req, res) => {
       }
     });
   } catch (error) {
-    res.send({
-      msg: "Error",
-    });
+    res.send([[]]);
   }
 });
 
 // Routes
-
-// app.post("/api/register/google", async (req, res) => {
-//   try {
-//     console.log(req.body.email);
-//     const email = req.body.email;
-//     await User.findOne({ email }, async (err, user) => {
-//       if (err) {
-//         return res.send({
-//           status: 409,
-//           msg: "Registration unsuccessful, please try again later!",
-//         });
-//       } else {
-//         const newUser = new User({
-//           email,
-//         });
-//         await newUser.save();
-//       }
-//     });
-//   } catch (error) {}
-// });
 
 app.post("/api/register/mail", async (req, res) => {
   try {
@@ -221,14 +198,26 @@ app.post("/api/checkuser", (req, res) => {
   }
 });
 
+function hasDuplicates(array) {
+  return new Set(array).size !== array.length;
+}
+
 app.post("/api/:eventName/register", async (req, res) => {
   try {
     let userIds = [];
+
     console.log(req.body.email);
     if (!req.body || req.body.email.length < 1) {
       return res.send({
         status: 409,
         msg: "Atleast one participant email is required",
+      });
+    }
+
+    if (hasDuplicates(req.body.email)) {
+      return res.send({
+        status: 409,
+        msg: "Duplicate emails sent",
       });
     }
 
