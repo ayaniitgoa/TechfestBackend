@@ -55,6 +55,51 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/api/teams/:eventName", (req, res) => {
+  try {
+    Event.find({ name: req.params.eventName }, async (err, data) => {
+      if (err)
+        return res.send({
+          msg: "Error",
+        });
+      if (!data) {
+        res.send({
+          data: {},
+        });
+      }
+
+      if (data) {
+        var participantData = [];
+
+        for (var i = 0; i < data[0].teams.length; i++) {
+          var pd = [];
+          for (var j = 0; j < data[0].teams[i].participants.length; j++) {
+            await User.findOne(
+              { _id: data[0].teams[i].participants[j] },
+              async (err, pD) => {
+                if (err)
+                  return res.send({
+                    msg: "Error",
+                  });
+                if (pD) {
+                  pd.push(pD);
+                }
+              }
+            );
+          }
+          participantData.push(pd);
+        }
+
+        res.send(participantData);
+      }
+    });
+  } catch (error) {
+    res.send({
+      msg: "Error",
+    });
+  }
+});
+
 // Routes
 
 // app.post("/api/register/google", async (req, res) => {
