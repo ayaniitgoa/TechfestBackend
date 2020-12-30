@@ -5,9 +5,9 @@ const bodyParser = require("body-parser");
 const app = express();
 const User = require("./user");
 const Event = require("./event");
-const path = require("path");
 const morgan = require("morgan");
 const { nanoid } = require("nanoid");
+const helmet = require("helmet");
 // const MongoStore = require("connect-mongo")(session);
 require("dotenv").config();
 //----------------------------------------- END OF IMPORTS---------------------------------------------------
@@ -26,6 +26,7 @@ mongoose.connect(
 );
 
 // Middleware
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
