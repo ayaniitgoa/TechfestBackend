@@ -1,10 +1,19 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
+const session = require("cookie-session");
 const bodyParser = require("body-parser");
 const app = express();
 const User = require("./user");
 const Event = require("./event");
+const { v4: uuidv4 } = require("uuid");
+const path = require("path");
+const jwt = require("jsonwebtoken");
+const pug = require("pug");
+const nodemailer = require("nodemailer");
 const morgan = require("morgan");
 const { nanoid } = require("nanoid");
 const helmet = require("helmet");
@@ -24,6 +33,10 @@ mongoose.connect(
     else console.log("Mongoose Is Connected");
   }
 );
+
+app.set("views", path.join(__dirname, "views"));
+
+app.set("view engine", "pug");
 
 // Middleware
 app.use(helmet());
@@ -52,12 +65,18 @@ app.get("/api/teams/:eventName", (req, res) => {
           msg: "Error",
         });
       if (!data) {
-        res.send({
-          data: {},
+        return res.send({
+          data: [[]],
         });
       }
 
-      if (data) {
+      if (data.length < 1) {
+        return res.send({
+          data: [[]],
+        });
+      }
+
+      if (data[0].teams) {
         var participantData = [];
 
         for (var i = 0; i < data[0].teams.length; i++) {
@@ -84,6 +103,19 @@ app.get("/api/teams/:eventName", (req, res) => {
     });
   } catch (error) {
     res.send([[]]);
+  }
+});
+
+app.get("/api/allusers", (req, res) => {
+  try {
+    User.find({}, (err, data) => {
+      if (err) return res.send({});
+      return res.send({
+        data,
+      });
+    });
+  } catch (error) {
+    return res.send({});
   }
 });
 
