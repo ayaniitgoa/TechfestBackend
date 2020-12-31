@@ -51,11 +51,11 @@ app.use(
 app.use(morgan("dev"));
 //----------------------------------------- END OF MIDDLEWARE---------------------------------------------------
 
-app.get("/", (req, res) => {
-  res.send({
-    success: "true",
-  });
-});
+// app.get("/", (req, res) => {
+//   res.send({
+//     success: "true",
+//   });
+// });
 
 app.get(`/api/teams/:eventName/${process.env.protectedToken}`, (req, res) => {
   try {
@@ -371,6 +371,14 @@ app.post("/api/:eventName/register", async (req, res) => {
 
 //----------------------------------------- END OF ROUTES---------------------------------------------------
 //Start Server
+
+//----------------------------------------- SERVE BUILD FOLDER ---------------------------------------------------
+
+app.use(express.static('build'));
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
+
 PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server Has Started");
