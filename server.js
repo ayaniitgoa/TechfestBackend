@@ -308,9 +308,8 @@ app.post("/api/:eventName/register", async (req, res) => {
             });
             await newEvent.save();
 
-            console.log("reached");
+            // Add events to user
             for (var i = 0; i < req.body.ids.length; i++) {
-              console.log("reached", req.params.eventName, req.body.ids[i]);
               await User.findOneAndUpdate(
                 { uid: req.body.ids[i] },
                 {
@@ -383,9 +382,9 @@ app.post("/api/:eventName/register", async (req, res) => {
 
 //----------------------------------------- SERVE BUILD FOLDER ---------------------------------------------------
 
-app.use(express.static('build'));
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+app.use(express.static("build"));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "build", "index.html"));
 });
 
 PORT = process.env.PORT || 5000;
