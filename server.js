@@ -10,6 +10,9 @@ const Event = require("./event");
 const morgan = require("morgan");
 const { nanoid } = require("nanoid");
 const helmet = require("helmet");
+const fs = require("fs");
+const path = require("path");
+const https = require("https");
 // const MongoStore = require("connect-mongo")(session);
 require("dotenv").config();
 //----------------------------------------- END OF IMPORTS---------------------------------------------------
@@ -388,7 +391,19 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "build", "index.html"));
 });
 
+const ssLServer = https.createServer(
+  {
+    cert: fs.readFileSync(
+      path.basename("/etc/letsencrypt/live/cepheus.iitgoa.ac.in/fullchain.pem")
+    ),
+    key: fs.readFileSync(
+      path.basename("/etc/letsencrypt/live/cepheus.iitgoa.ac.in/privkey.pem")
+    ),
+  },
+  app
+);
+
 PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log("Server Has Started");
+ssLServer.listen(PORT, () => {
+  console.log("Server has started");
 });
